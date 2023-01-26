@@ -96,9 +96,10 @@ func <- function(...){
   arguments <- list(...)
   #return(arguments)
   #lapply(arguments, str)
-  #invisible(NULL)
+  invisible(NULL)
   #lapply(arguments, \(x) print(environment(x)))
   lapply(arguments, \(x) print(data.table::address(x)))
+  
 } 
 ```
 
