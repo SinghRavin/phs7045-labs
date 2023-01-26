@@ -1,10 +1,6 @@
 ---
 title: "Lab 03 - Functions and data.table"
-format:
-  html:
-    embed-resources: true
-editor_options: 
-  chunk_output_type: console
+format: gfm
 ---
 
 # Learning goals
@@ -96,7 +92,7 @@ func <- function(...){
   arguments <- list(...)
   #return(arguments)
   #lapply(arguments, str)
-  #invisible(NULL)
+  invisible(NULL)
   #lapply(arguments, \(x) print(environment(x)))
   lapply(arguments, \(x) print(data.table::address(x)))
 } 
@@ -110,7 +106,10 @@ Knit the document, commit your changes, and push them to GitHub.
 A concept we did not review was lazy evaluation. Write a function with two arguments (`a` and `b`)  that only uses one of them as an integer, and then call the function passing the following arguments `(1, this_stuff)`
 
 ```{r}
-
+fun <- function(a,b){
+  print(a)
+}
+fun(1, abcdefgh)
 ```
 
 Knit the document, commit your changes, and push them to GitHub.
