@@ -8,7 +8,7 @@ fun_1 <- function(k=1000, N = 228, seed = 100, alpha = 0.35, beta=0.65, p=0.35, 
   y_arm0 <- rbinom(N/4, 1, p=p)
   y_arm1 <- rbinom(N/4, 1, p=p)
   y_arm2 <- rbinom(N/4, 1, p=p)
-  y_arm3 <- rbinom(N/4, 1, p=p)
+  y_arm3 <- rbinom(N/4, 1, p=p) # some changes..
 
   data_mat <- as.matrix(cbind(y_arm0, y_arm1, y_arm2, y_arm3))
   # Drawing from posterior distribution.
