@@ -109,7 +109,7 @@ A concept we did not review was lazy evaluation. Write a function with two argum
 fun <- function(a,b){
   print(a)
 }
-fun(1, abcdefgh)
+fun(1, SomethingToWriteHere)
 ```
 
 Knit the document, commit your changes, and push them to GitHub.
