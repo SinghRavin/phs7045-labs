@@ -95,6 +95,7 @@ func <- function(...){
   invisible(NULL)
   #lapply(arguments, \(x) print(environment(x)))
   lapply(arguments, \(x) print(data.table::address(x)))
+  
 } 
 ```
 
