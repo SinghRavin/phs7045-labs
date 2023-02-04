@@ -19,7 +19,8 @@ design1_func <- function(k=1000, N=228, seed=100, alpha=0.35, beta=0.65,
   p_arm3 <- rbeta(k, alpha + sum(y_arm3), beta + N/4 - sum(y_arm3))
   p_vec <- c(sum(as.numeric(p_arm1>p_arm0))/k, sum(as.numeric(p_arm2>p_arm0))/k, 
            sum(as.numeric(p_arm3>p_arm0))/k)
-  return(c(which.max(p_vec)+1,p_vec))## +1 because indexing of arms starts with 1.
+  char <- paste("Arm",which.max(p_vec)+1,"is best") ## +1 because indexing of arms starts with 1.
+  return(list(char,p_vec))
 }
 
 ##### ----------- Design 2 -----------#####
@@ -166,7 +167,8 @@ best_arm <- function(p_arm_inputlist){
   p_vec <- c(sum(as.numeric(p_arm_inputlist[[2]]>p_arm_inputlist[[1]]))/len,
              sum(as.numeric(p_arm_inputlist[[3]]>p_arm_inputlist[[1]]))/len, 
              sum(as.numeric(p_arm_inputlist[[4]]>p_arm_inputlist[[1]]))/len)
-  return(c(which.max(p_vec)+1,p_vec)) ## +1 because indexing of arms starts with 1.
+  char <- paste("Arm",which.max(p_vec)+1,"is best") ## +1 because indexing of arms starts with 1.
+  return(list(char,p_vec))
 }
 
 design2_func <- function(seed=100, total_patients=228, k=1000, patients_num=40, p=0.35,
@@ -190,6 +192,8 @@ design2_func <- function(seed=100, total_patients=228, k=1000, patients_num=40, 
                               keep_n_allocation_vector)
     arm_weights <- rar_weights_update_func(posterior, n_allocation)
     patients_assigned <- patients_assigned + interim
-    }
-  return(best_arm(posterior))
+  }
+  return_list <- best_arm(posterior)
+  return_list[[3]] <- keep_n_allocation_vector
+  return(return_list)
   }
