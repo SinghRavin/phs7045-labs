@@ -197,3 +197,42 @@ design2_func <- function(seed=100, total_patients=228, k=1000, patients_num=40, 
   return_list[[3]] <- keep_n_allocation_vector
   return(return_list)
   }
+
+
+start <- Sys.time()
+
+replicates_num <- 10000
+success_logical1 <- logical()
+
+for (i in 1:replicates_num){
+  design2_output <- design2_func(seed = i)
+  if (max(design2_output[[2]])>0.9892){
+    success_logical1[i] <- TRUE
+  }
+  else{
+    success_logical1[i] <- FALSE
+  }
+}
+
+print( Sys.time() - start)
+
+# Vectorized method
+
+start <- Sys.time()
+
+success_func <- function(x){
+  design2_output <- design2_func(seed = x)
+  if (max(design2_output[[2]])>0.9892){
+    return(TRUE)
+  }
+  else{
+    return(FALSE)
+  }
+}
+
+success_logical2 <- lapply(1:replicates_num, success_func)
+
+print( Sys.time() - start)
+
+sum(as.numeric(success_logical1))/10000
+sum(as.numeric(success_logical2))/10000
