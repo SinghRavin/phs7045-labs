@@ -4,23 +4,23 @@
 ##### ----------- Design 1 -----------#####
 
 design1_func <- function(k=1000, N=228, seed=100, alpha=0.35, beta=0.65,
-                         p=0.35, delta=0.9912){
+                         trt_effect=c(0.35, 0.35, 0.35, 0.35)){
   set.seed(seed)
-  y_arm0 <- rbinom(N/4, 1, p=p)
-  y_arm1 <- rbinom(N/4, 1, p=p)
-  y_arm2 <- rbinom(N/4, 1, p=p)
-  y_arm3 <- rbinom(N/4, 1, p=p)
-
-  data_mat <- as.matrix(cbind(y_arm0, y_arm1, y_arm2, y_arm3))
+  y_arm1 <- rbinom(N/4, 1, p=trt_effect[1])
+  y_arm2 <- rbinom(N/4, 1, p=trt_effect[2])
+  y_arm3 <- rbinom(N/4, 1, p=trt_effect[3])
+  y_arm4 <- rbinom(N/4, 1, p=trt_effect[4])
+  
   # Drawing from posterior distribution.
-  p_arm0 <- rbeta(k, alpha + sum(y_arm0), beta + N/4 - sum(y_arm0))
   p_arm1 <- rbeta(k, alpha + sum(y_arm1), beta + N/4 - sum(y_arm1))
   p_arm2 <- rbeta(k, alpha + sum(y_arm2), beta + N/4 - sum(y_arm2))
   p_arm3 <- rbeta(k, alpha + sum(y_arm3), beta + N/4 - sum(y_arm3))
-  p_vec <- c(sum(as.numeric(p_arm1>p_arm0))/k, sum(as.numeric(p_arm2>p_arm0))/k, 
-           sum(as.numeric(p_arm3>p_arm0))/k)
+  p_arm4 <- rbeta(k, alpha + sum(y_arm4), beta + N/4 - sum(y_arm4))
+  p_arm_list <- list(p_arm1, p_arm2, p_arm3, p_arm4)
+  p_vec <- c(sum(as.numeric(p_arm2>p_arm1))/k, sum(as.numeric(p_arm3>p_arm1))/k, 
+           sum(as.numeric(p_arm4>p_arm1))/k)
   char <- paste("Arm",which.max(p_vec)+1,"is best") ## +1 because indexing of arms starts with 1.
-  return(list(char,p_vec))
+  return(list(char,p_vec,rep(N/4,4),p_arm_list))
 }
 
 ##### ----------- Design 2 -----------#####
@@ -37,7 +37,7 @@ keep_y_arm1 <- numeric()
 keep_y_arm2 <- numeric()
 keep_y_arm3 <- numeric()
 keep_y_arm4 <- numeric()
-p <- 0.35
+trt_effect=c(0.35, 0.35, 0.35, 0.35)
 alpha <- 0.35
 beta <- 0.65
 patients_assigned <- 0
@@ -53,10 +53,10 @@ while (patients_assigned < total_patients){
   n_allocation[3] <- round(arm_weights[3]*interim,0)
   n_allocation[4] <- round(arm_weights[4]*interim,0)
   
-  y_arm1 <- rbinom(n_allocation[1], 1, p=p)
-  y_arm2 <- rbinom(n_allocation[2], 1, p=p)
-  y_arm3 <- rbinom(n_allocation[3], 1, p=p)
-  y_arm4 <- rbinom(n_allocation[4], 1, p=p)
+  y_arm1 <- rbinom(n_allocation[1], 1, p=trt_effect[1])
+  y_arm2 <- rbinom(n_allocation[2], 1, p=trt_effect[2])
+  y_arm3 <- rbinom(n_allocation[3], 1, p=trt_effect[3])
+  y_arm4 <- rbinom(n_allocation[4], 1, p=trt_effect[4])
   
   keep_y_arm1 <- c(keep_y_arm1,y_arm1)
   keep_y_arm2 <- c(keep_y_arm2,y_arm2)
@@ -102,11 +102,12 @@ n_allocation_func <- function(n, arm_weights_vec){
   return(n_allocation_vector)
 }
 
-binom_outcome_sample_func <- function(n_allocation_input_vec, p){
-  y_arm1_vec <- rbinom(n_allocation_input_vec[1], 1, p=p)
-  y_arm2_vec <- rbinom(n_allocation_input_vec[2], 1, p=p)
-  y_arm3_vec <- rbinom(n_allocation_input_vec[3], 1, p=p)
-  y_arm4_vec <- rbinom(n_allocation_input_vec[4], 1, p=p)
+binom_outcome_sample_func <- function(n_allocation_input_vec,
+                                      trt_effect=c(0.35,0.35,0.35,0.35)){
+  y_arm1_vec <- rbinom(n_allocation_input_vec[1], 1, p=trt_effect[1])
+  y_arm2_vec <- rbinom(n_allocation_input_vec[2], 1, p=trt_effect[2])
+  y_arm3_vec <- rbinom(n_allocation_input_vec[3], 1, p=trt_effect[3])
+  y_arm4_vec <- rbinom(n_allocation_input_vec[4], 1, p=trt_effect[4])
   return(list(y_arm1_vec, y_arm2_vec, y_arm3_vec, y_arm4_vec))
 }
 
@@ -171,8 +172,9 @@ best_arm <- function(p_arm_inputlist){
   return(list(char,p_vec))
 }
 
-design2_func <- function(seed=100, total_patients=228, k=1000, patients_num=40, p=0.35,
-                         alpha=0.35, beta=0.65, delta=0.9892){
+design2_func <- function(seed=100, total_patients=228, k=1000, patients_num=40,
+                         trt_effect=c(0.35, 0.35, 0.35, 0.35),alpha=0.35,
+                         beta=0.65){
   set.seed(seed)
   keep_y_arm_list <- list(numeric(0), numeric(0), numeric(0), numeric(0))
   keep_n_allocation_vector <- c(0,0,0,0)
@@ -186,7 +188,7 @@ design2_func <- function(seed=100, total_patients=228, k=1000, patients_num=40, 
     n_allocation <- n_allocation_func(interim, arm_weights)
     keep_n_allocation_vector <- storing_n_allocation_func(keep_n_allocation_vector,
                                                         n_allocation)
-    y_arm_list <- binom_outcome_sample_func(n_allocation, p)
+    y_arm_list <- binom_outcome_sample_func(n_allocation, trt_effect)
     keep_y_arm_list <- storing_outcome_sample_func(keep_y_arm_list, y_arm_list)
     posterior <- posterior_func(k, alpha, beta, keep_y_arm_list,
                               keep_n_allocation_vector)
@@ -195,44 +197,79 @@ design2_func <- function(seed=100, total_patients=228, k=1000, patients_num=40, 
   }
   return_list <- best_arm(posterior)
   return_list[[3]] <- keep_n_allocation_vector
+  return_list[[4]] <- posterior
   return(return_list)
   }
 
-
-start <- Sys.time()
+# Calculation of Type I error.
 
 replicates_num <- 10000
-success_logical1 <- logical()
-
-for (i in 1:replicates_num){
-  design2_output <- design2_func(seed = i)
-  if (max(design2_output[[2]])>0.9892){
-    success_logical1[i] <- TRUE
-  }
-  else{
-    success_logical1[i] <- FALSE
-  }
-}
-
-print( Sys.time() - start)
-
-# Vectorized method
+delta_design1 = 0.9912
+delta_design2 = 0.9892
 
 start <- Sys.time()
 
-success_func <- function(x){
-  design2_output <- design2_func(seed = x)
-  if (max(design2_output[[2]])>0.9892){
-    return(TRUE)
-  }
-  else{
-    return(FALSE)
-  }
+success_func_design1 <- function(x){
+  design1_output <- design1_func(seed = x)
+  ifelse(max(design1_output[[2]])>delta_design1, TRUE, FALSE)
 }
 
-success_logical2 <- lapply(1:replicates_num, success_func)
+success_func_design2 <- function(x){
+  design2_output <- design2_func(seed = x)
+  ifelse(max(design2_output[[2]])>delta_design2, TRUE, FALSE)
+}
+
+success_logical_design1 <- lapply(1:replicates_num, success_func_design1)
+success_logical_design2 <- lapply(1:replicates_num, success_func_design2)
 
 print( Sys.time() - start)
 
-sum(as.numeric(success_logical1))/10000
-sum(as.numeric(success_logical2))/10000
+typeI_error_design1 <- sum(as.numeric(success_logical_design1))/replicates_num
+typeI_error_design2 <- sum(as.numeric(success_logical_design2))/replicates_num
+
+# Finding the delta for each design.
+
+max_prob_func_design1 <- function(x){
+  design1_output <- design1_func(seed = x)
+  return(max(design1_output[[2]]))
+}
+
+max_prob_func_design2 <- function(x){
+  design2_output <- design2_func(seed = x)
+  return(max(design2_output[[2]]))
+}
+
+max_prob_vec_design1 <- lapply(1:replicates_num, max_prob_func_design1)
+max_prob_vec_design2 <- lapply(1:replicates_num, max_prob_func_design2)
+
+quantile(as.numeric(max_prob_vec_design1),probs=c(0.975))
+quantile(as.numeric(max_prob_vec_design2),probs=c(0.975))
+
+# Constructing Table 2.
+
+which_max_dataframe <- function(p_arm_input_list){
+  
+  d <- as.data.frame(cbind(p_arm_input_list[[1]], p_arm_input_list[[2]],
+                           p_arm_input_list[[3]], p_arm_input_list[[4]]))
+  d$max_index <- apply(d, 1, FUN = function(x) which.max(x))
+  
+  return(d)
+}
+
+design1_mixed_scenario <- design1_func(trt_effect = c(0.35, 0.45, 0.55, 0.65))
+design2_mixed_scenario <- design2_func(trt_effect = c(0.35, 0.45, 0.55, 0.65))
+
+df_design1 <- which_max_dataframe(design1_mixed_scenario[[4]])
+df_design2 <- which_max_dataframe(design2_mixed_scenario[[4]])
+
+a <- sum(df_design1$max_index>=2)/dim(df_design1)[1]
+b <- sum(df_design1$max_index>=3)/dim(df_design1)[1]
+c <- sum(df_design1$max_index>=4)/dim(df_design1)[1]
+
+d <- sum(df_design2$max_index>=2)/dim(df_design2)[1]
+e <- sum(df_design2$max_index>=3)/dim(df_design2)[1]
+f <- sum(df_design2$max_index>=4)/dim(df_design2)[1]
+
+table2 <- data.frame(c(a,d), c(b,e), c(c,f))
+colnames(table2) <- c("Arm 2 or better", "Arm 3 or better", " Arm 4 is best")
+rownames(table2) <- c("F25", "RMatch")
