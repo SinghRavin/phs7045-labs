@@ -139,3 +139,5 @@ result_parallel <- parSapply(cl,1:1000,design1_func)
 bench::mark("normal"=replicate(1000, design1_func),
             "parallel"=parSapply(cl,1:1000,design1_func),
             relative = TRUE, check = FALSE)
+
+# Surprisingly, the parallelization doesn't help in my case.
