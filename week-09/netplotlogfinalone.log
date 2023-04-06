@@ -1,0 +1,17 @@
+
+Attaching package: ‘igraph’
+
+The following object is masked from ‘package:netplot’:
+
+    ego
+
+The following objects are masked from ‘package:stats’:
+
+    decompose, spectrum
+
+The following object is masked from ‘package:base’:
+
+    union
+
+pdf 
+  2 

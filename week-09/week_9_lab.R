@@ -16,9 +16,10 @@ np <- nplot(
 # So we need to print them
 print(np)
 
+data("UKfaculty")
+
 col <- V(UKfaculty)$Group
 
-data("UKfaculty")
 plot <- nplot(UKfaculty, vertex.color=col)
 
 png("plot.fig", width=1024, height=780)

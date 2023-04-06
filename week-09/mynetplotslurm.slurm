@@ -5,10 +5,10 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --time=00:05:00
-#SBATCH --output=netplotlog.log
+#SBATCH --output=netplotlogfinalone.log
 
 # Loading R
-module load R/4.1.3
+module load R/4.2.2
 
 #  Running the script
-Rscript --vanilla netplot-example.R
+Rscript --vanilla week_9_lab.R
