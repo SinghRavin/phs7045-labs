@@ -1,0 +1,36 @@
+---
+title: "Week-09"
+author: "Ravinder Singh"
+date: "2023-04-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Task 1:
+
+The package Rmpi allows for running the parallel codes across multiple nodes/CPU.
+
+We have cores as the smallest unit, then we have CPU and then we have nodes. So Rmpi package will allows us to run the parallel codes on cores from different nodes/CPU. This is particularly helpful when the number of cores are not enough within a nodes/CPU.
+
+Task 2:
+
+At the core level, using SIMD instructions.
+
+-SIMD instructions allows for the parallelization within the cores using something called "SIMD thread".
+
+At the CPU level using multiple cores within a program (e.g., loop-level).
+
+-OpenMP/core
+
+Same, but replicating the job within a node.
+
+-Making multiple clusters.
+
+At the node level, replicating the job across nodes.
+
+-Job array. Example would be running a simulation.
+
+
